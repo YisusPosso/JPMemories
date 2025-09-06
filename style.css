@@ -185,8 +185,8 @@ h1 {
 
 #timer-controls {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    bottom: 20px;
+    right: 20px;
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     padding: 8px 15px;
@@ -194,11 +194,11 @@ h1 {
     display: flex;
     align-items: center;
     font-size: 14px;
-    z-index: 3; /* Nuevo z-index */
+    z-index: 3;
 }
 
-#timer-input {
-    width: 40px;
+#timer-select {
+    width: 60px;
     margin: 0 5px;
     background-color: transparent;
     border: 1px solid white;
