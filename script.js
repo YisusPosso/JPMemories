@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Función de transición unificada
     function navigateWithTransition(imageUrl) {
-        lightboxImage.style.opacity = 0.5;
+        lightboxImage.style.opacity = 0;
         setTimeout(() => {
             lightboxImage.src = imageUrl;
             lightboxBackground.style.backgroundImage = `url(${imageUrl})`;
