@@ -65,12 +65,15 @@ h1 {
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    overflow: hidden; /* Asegura que la imagen no desborde durante la transición */
 }
 
 #lightbox-image {
     max-width: 100%;
     max-height: 100vh;
     object-fit: contain;
+    /* Transición de opacidad para el efecto de fade */
+    transition: opacity 0.5s ease-in-out;
 }
 
 .nav-btn {
@@ -100,4 +103,53 @@ h1 {
 
 #next-btn {
     right: 20px;
+}
+
+/* Estilos para el reloj y la fecha */
+#datetime-display {
+    position: absolute;
+    bottom: 20px; /* Ajusta la posición vertical */
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente para mejor lectura */
+    padding: 8px 15px;
+    border-radius: 10px;
+    pointer-events: none; /* Asegura que no bloquee clics en las imágenes */
+}
+
+#time-display {
+    font-size: 28px; /* Tamaño más grande para la hora */
+}
+
+#date-display {
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+/* Nuevos estilos para el control del temporizador */
+#timer-controls {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+#timer-input {
+    width: 40px;
+    margin: 0 5px;
+    background-color: transparent;
+    border: 1px solid white;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
 }
