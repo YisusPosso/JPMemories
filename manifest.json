@@ -2,7 +2,7 @@
     "name": "Galería de Fotos",
     "short_name": "Fotos",
     "description": "Una galería de fotos simple para tus iPads antiguos.",
-    "start_url": "/",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#007aff",
