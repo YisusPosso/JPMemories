@@ -9,62 +9,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextBtn = document.getElementById('next-btn');
     const timeDisplay = document.getElementById('time-display');
     const dateDisplay = document.getElementById('date-display');
-    const timerInput = document.getElementById('timer-input');
+    const timerSelect = document.getElementById('timer-select'); // Cambiado a timerSelect
 
     let currentImageIndex = 0;
-    const images = []; // Contiene las URL de las imágenes
+    const images = [];
     let timerInterval = null;
     const DB_NAME = 'PhotoGalleryDB';
     const DB_VERSION = 1;
     const STORE_NAME = 'photos';
 
-    // Función para activar el modo de pantalla completa
-    function requestFullScreen(element) {
-        if (element.requestFullscreen) {
-            element.requestFullscreen();
-        } else if (element.mozRequestFullScreen) { /* Firefox */
-            element.mozRequestFullScreen();
-        } else if (element.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
-            element.webkitRequestFullscreen();
-        } else if (element.msRequestFullscreen) { /* IE/Edge */
-            element.msRequestFullscreen();
-        }
-    }
-    
-    // Función para salir del modo de pantalla completa
-    function exitFullScreen() {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.mozCancelFullScreen) { /* Firefox */
-            document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
-            document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) { /* IE/Edge */
-            document.msExitFullscreen();
-        }
-    }
-
-    // Función para abrir la base de datos (IndexedDB)
     function openDatabase() {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open(DB_NAME, DB_VERSION);
-
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
                 db.createObjectStore(STORE_NAME, { keyPath: 'id' });
             };
-
             request.onsuccess = (event) => {
                 resolve(event.target.result);
             };
-
             request.onerror = (event) => {
                 reject(event.target.error);
             };
         });
     }
 
-    // Función para guardar una imagen en IndexedDB
     async function saveImage(id, imageUrl) {
         const db = await openDatabase();
         const transaction = db.transaction([STORE_NAME], 'readwrite');
@@ -73,12 +42,10 @@ document.addEventListener('DOMContentLoaded', () => {
         transaction.oncomplete = () => console.log('Imagen guardada en la base de datos');
     }
 
-    // Función para eliminar una imagen de IndexedDB
     async function deleteImage(imageUrl) {
         const db = await openDatabase();
         const transaction = db.transaction([STORE_NAME], 'readwrite');
         const store = transaction.objectStore(STORE_NAME);
-
         const request = store.getAll();
         request.onsuccess = () => {
             const items = request.result;
@@ -92,13 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // Función para cargar las imágenes desde IndexedDB al inicio
     async function loadImages() {
         const db = await openDatabase();
         const transaction = db.transaction([STORE_NAME], 'readonly');
         const store = transaction.objectStore(STORE_NAME);
         const request = store.getAll();
-
         request.onsuccess = () => {
             const storedImages = request.result;
             if (storedImages.length > 0) {
@@ -110,73 +75,46 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // Nueva función para crear la miniatura con el botón de eliminar
     function createThumbnail(imageUrl) {
         const container = document.createElement('div');
         container.classList.add('gallery-item-container');
-
         const img = document.createElement('img');
         img.src = imageUrl;
         img.classList.add('gallery-item');
-        
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = '🗑️';
         deleteBtn.classList.add('delete-thumb-btn');
-
         container.appendChild(img);
         container.appendChild(deleteBtn);
         galleryContainer.appendChild(container);
-
         img.addEventListener('click', () => {
             openLightbox(images.indexOf(imageUrl));
         });
-
         deleteBtn.addEventListener('click', (event) => {
-            event.stopPropagation(); // Evita que se abra el lightbox
-            
-            // 1. Eliminar de IndexedDB
+            event.stopPropagation();
             deleteImage(imageUrl);
-
-            // 2. Eliminar del array
             const indexToRemove = images.indexOf(imageUrl);
             if (indexToRemove > -1) {
                 images.splice(indexToRemove, 1);
             }
-
-            // 3. Eliminar del DOM
             container.remove();
         });
     }
 
-    // Llamamos a la función de carga al inicio de la aplicación
     loadImages();
 
-    // Función para actualizar la hora y la fecha
     function updateDateTime() {
         const now = new Date();
-        const timeOptions = { 
-            hour: '2-digit', 
-            minute: '2-digit', 
-            hour12: true,
-            timeZone: 'America/Bogota'
-        };
+        const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'America/Bogota' };
         timeDisplay.textContent = now.toLocaleTimeString('es-CO', timeOptions);
-        
-        const dateOptions = { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric',
-            timeZone: 'America/Bogota'
-        };
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'America/Bogota' };
         dateDisplay.textContent = now.toLocaleDateString('es-CO', dateOptions);
     }
     setInterval(updateDateTime, 1000);
     updateDateTime();
 
-    // Lógica para el temporizador automático
     function startTimer() {
-        const intervalInSeconds = parseInt(timerInput.value);
+        const intervalInSeconds = parseInt(timerSelect.value);
         if (isNaN(intervalInSeconds) || intervalInSeconds < 1) {
             return;
         }
@@ -191,8 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(timerInterval);
         }
     }
-    
-    // Función de transición unificada
+
     function navigateWithTransition(imageUrl) {
         lightboxImage.style.opacity = 0;
         setTimeout(() => {
@@ -202,7 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 
-    // Cargar y mostrar imágenes
     photoUpload.addEventListener('change', (event) => {
         const files = event.target.files;
         for (const file of files) {
@@ -218,19 +154,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Abrir el visor de fotos con transición y arrancar el temporizador
     const openLightbox = (index) => {
         if (images.length === 0) return;
         currentImageIndex = index;
         navigateWithTransition(images[currentImageIndex]);
         lightbox.classList.remove('hidden');
         startTimer();
-        
-        // Entrar en modo de pantalla completa al abrir el visor
         requestFullScreen(document.body);
     };
 
-    // Navegar por las fotos con transición
     const navigate = (direction) => {
         if (images.length === 0) {
             closeBtn.click();
@@ -240,7 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
         navigateWithTransition(images[currentImageIndex]);
     };
 
-    // Control de eventos para los botones de navegación
     prevBtn.addEventListener('click', () => {
         stopTimer();
         navigate(-1);
@@ -250,17 +181,38 @@ document.addEventListener('DOMContentLoaded', () => {
         navigate(1);
     });
 
-    // Cierra el visor y detiene el temporizador
     closeBtn.addEventListener('click', () => {
         lightbox.classList.add('hidden');
         stopTimer();
-        exitFullScreen(); // Salir de pantalla completa al cerrar
+        exitFullScreen();
     });
 
-    // Vuelve a iniciar el temporizador si el usuario cambia el valor
-    timerInput.addEventListener('change', startTimer);
+    timerSelect.addEventListener('change', startTimer); // Cambiado a timerSelect
 
-    // Registrar el service worker para PWA
+    function requestFullScreen(element) {
+        if (element.requestFullscreen) {
+            element.requestFullscreen();
+        } else if (element.mozRequestFullScreen) {
+            element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen();
+        } else if (element.msRequestFullscreen) {
+            element.msRequestFullscreen();
+        }
+    }
+    
+    function exitFullScreen() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    }
+
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js').then(registration => {
